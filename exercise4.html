@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Exercise 4 - Product Card</title>
+  <style>
+    .card {
+      width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 40px auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+      font-family: Arial, sans-serif;
+    }
+
+    .product-image {
+      width: 100%;
+      height: 200px;
+      background: #f4f4f4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+
+    .product-title {
+      font-size: 20px;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .product-desc {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 12px;
+    }
+
+    .price {
+      font-size: 18px;
+      color: #000;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .buy-btn {
+      background: #007bff;
+      color: white;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .buy-btn:hover {
+      background: #0056b3;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img src="download.jpg" alt="Wireless Headphones" class="product-image">
+    <div class="product-title">Wireless Headphones</div>
+    <div class="product-desc">Comfortable over-ear headphones with noise cancellation.</div>
+    <div class="price">₹2,499</div>
+    <button class="buy-btn">Buy Now</button>
+  </div>
+</body>
+</html>

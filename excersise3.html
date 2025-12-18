@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Exercise 3 - Advanced Registration Form</title>
+</head>
+<body>
+	<h1>Registration Form</h1>
+
+	<form action="#" method="post" enctype="multipart/form-data">
+		<label for="fullname">Full Name:</label><br>
+		<input type="text" id="fullname" name="fullname" required><br><br>
+
+		<label for="email">Email:</label><br>
+		<input type="email" id="email" name="email" required><br><br>
+
+		<label for="dob">Date of Birth:</label><br>
+		<input type="date" id="dob" name="dob" required><br><br>
+
+		<label for="phone">Phone Number:</label><br>
+		<input type="tel" id="phone" name="phone" pattern="\d{10}" placeholder="10 digits" required><br><br>
+
+		<label for="password">Password:</label><br>
+		<input type="password" id="password" name="password" required><br><br>
+
+		<label for="profile">Choose Profile Picture:</label><br>
+		<input type="file" id="profile" name="profile" accept="image/*"><br><br>
+
+		<label>
+			<input type="checkbox" id="terms" name="terms" required>
+			I accept the Terms & Conditions
+		</label>
+		<br><br>
+
+		<input type="submit" value="Register">
+	</form>
+
+</body>
+</html>
+
