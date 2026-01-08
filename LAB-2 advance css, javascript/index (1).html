@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lab 2 Advanced css and javascript</title>
+    <style>
+        .task-board {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .column {
+            width: 30%;
+            min-height: 200px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .column h3 {
+            text-align: center;
+        }
+
+        .card {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: move;
+        }
+
+        .completed-card {
+            background-color: #d4edda;
+            /* Greenish background */
+            border-color: #c3e6cb;
+        }
+    </style>
+
+</head>
+
+<body>
+    <h1>Exercise 1</h1>
+    <p><b>HTML5 Canvas</b></p>
+    <canvas id="myCanvas" width="500" height="300" style="border:1px solid #000000;"></canvas><br>
+
+
+    <h1>Execrcise 2</h1>
+    <p><b>HTML5 Audio and Video</b></p>
+
+    <h3>Audio Player</h3>
+    <audio id="myAudio">
+        <source src="sample.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <br>
+    <button onclick="playAudio()">Play</button>
+    <button onclick="pauseAudio()">Pause</button>
+    <button onclick="volumeUp('audio')">Vol +</button>
+    <button onclick="volumeDown('audio')">Vol -</button>
+    <span id="audioTime">0:00 / 0:00</span>
+    <br><br>
+
+    <h3>Video Player</h3>
+    <video id="myVideo" width="320" height="240">
+        <source src="sample.mp4" type="video/mp4">
+        Your browser does not support the video element.
+    </video>
+    <br>
+    <button onclick="playVideo()">Play</button>
+    <button onclick="pauseVideo()">Pause</button>
+    <button onclick="volumeUp('video')">Vol +</button>
+    <button onclick="volumeDown('video')">Vol -</button>
+    <span id="videoTime">0:00 / 0:00</span>
+
+    <h1>Execrcise 3</h1>
+    <p><b>Advanced Drag and Drop Task Manager</b></p>
+
+    <input type="text" id="taskName" placeholder="Enter Task Name">
+    <button onclick="addTask()">Add Task</button>
+
+    <div class="task-board">
+        <div class="column" id="todo" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h3>To Do</h3>
+        </div>
+        <div class="column" id="inprogress" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h3>In Progress</h3>
+        </div>
+        <div class="column" id="completed" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h3>Completed</h3>
+        </div>
+    </div>
+
+    <h1>Execrcise 4</h1>
+    <p><b>Advanced LocalStorage User Management System</b></p>
+    <h2>User Registration</h2>
+    <form id="regForm">
+        <input type="text" id="name" placeholder="Name" required><br>
+        <input type="email" id="email" placeholder="Email" required><br>
+        <input type="text" id="mobile" placeholder="Mobile (10 digits)" required><br>
+        <input type="password" id="pass" placeholder="Password (min 6)" required><br>
+        <button type="submit">Register</button>
+    </form>
+
+    <button onclick="clearAll()">Clear All Users</button>
+
+    <table border="1" id="userTable" style="margin-top: 20px; width: 100%;">
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Mobile</th>
+            <th>Action</th>
+        </tr>
+    </table>
+
+    <script>
+        var c = document.getElementById("myCanvas");
+        var ctx = c.getContext("2d");
+
+
+        ctx.fillStyle = "#FF0000";
+        ctx.fillRect(20, 20, 150, 100);
+
+
+        ctx.beginPath();
+        ctx.arc(250, 70, 50, 0, 2 * Math.PI);
+        ctx.fillStyle = "#00FF00";
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(20, 150);
+        ctx.lineTo(400, 150);
+        ctx.strokeStyle = "#0000FF";
+        ctx.stroke();
+
+        ctx.font = "30px Arial";
+        ctx.fillStyle = "black";
+        ctx.fillText("HTML5 Canvas", 20, 200);
+
+        // --- Exercise 2: Audio & Video Logic ---
+        var audio = document.getElementById("myAudio");
+        var video = document.getElementById("myVideo");
+
+        audio.ontimeupdate = function () { updateTime(audio, "audioTime"); };
+        video.ontimeupdate = function () { updateTime(video, "videoTime"); };
+
+        function playAudio() {
+            audio.play();
+        }
+        function pauseAudio() {
+            audio.pause();
+        }
+        function playVideo() {
+            video.play();
+        }
+        function pauseVideo() {
+            video.pause();
+        }
+
+        function volumeUp(type) {
+            var media = (type === 'audio') ? audio : video;
+            if (media.volume < 1) media.volume = Math.min(1, media.volume + 0.1);
+        }
+
+        function volumeDown(type) {
+            var media = (type === 'audio') ? audio : video;
+            if (media.volume > 0) media.volume = Math.max(0, media.volume - 0.1);
+        }
+
+        function updateTime(media, elementId) {
+            var currTime = formatTime(media.currentTime);
+            var duration = formatTime(media.duration || 0);
+            document.getElementById(elementId).innerText = currTime + " / " + duration;
+        }
+
+        function formatTime(seconds) {
+            var min = Math.floor(seconds / 60);
+            var sec = Math.floor(seconds % 60);
+            if (sec < 10) sec = "0" + sec;
+            return min + ":" + sec;
+        }
+
+        // --- Exercise 3: Drag & Drop Logic ---
+        function addTask() {
+            var input = document.getElementById("taskName");
+            var name = input.value;
+            if (name === "") {
+                alert("Please enter a task name.");
+                return;
+            }
+
+            var date = new Date().toLocaleDateString();
+            var taskId = "task" + new Date().getTime();
+
+            var card = document.createElement("div");
+            card.className = "card";
+            card.id = taskId;
+            card.draggable = true;
+            card.ondragstart = drag;
+            card.innerHTML = "<strong>" + name + "</strong><br><small>" + date + "</small>";
+
+            document.getElementById("todo").appendChild(card);
+            input.value = "";
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            var draggedElement = document.getElementById(data);
+
+            // Find the closest column parent (in case dropped on another card)
+            var targetColumn = ev.target.closest('.column');
+
+            if (targetColumn) {
+                targetColumn.appendChild(draggedElement);
+
+                if (targetColumn.id === "completed") {
+                    draggedElement.classList.add("completed-card");
+                    // Use a small timeout to allow the visual update before alert
+                    setTimeout(function () {
+                        alert("Task Completed Successfully");
+                    }, 100);
+                } else {
+                    draggedElement.classList.remove("completed-card");
+                }
+            }
+        }
+
+        // --- Exercise 4: localstorage ---
+        const form = document.getElementById("regForm");
+
+        form.onsubmit = function (e) {
+            e.preventDefault();
+            let users = JSON.parse(localStorage.getItem("users") || "[]");
+
+            let name = document.getElementById("name").value;
+            let email = document.getElementById("email").value;
+            let mobile = document.getElementById("mobile").value;
+            let pass = document.getElementById("pass").value;
+
+            if (mobile.length !== 10) { alert("Mobile must be 10 digits"); return; }
+            if (pass.length < 6) { alert("Password too short"); return; }
+            if (users.some(u => u.email === email)) { alert("Duplicate email"); return; }
+
+            users.push({ name, email, mobile, pass });
+            localStorage.setItem("users", JSON.stringify(users));
+            displayUsers();
+            form.reset();
+        };
+
+        function displayUsers() {
+            let users = JSON.parse(localStorage.getItem("users") || "[]");
+            let table = document.getElementById("userTable");
+            table.innerHTML = "<tr><th>Name</th><th>Email</th><th>Mobile</th><th>Action</th></tr>";
+
+            users.forEach((user, index) => {
+                let row = table.insertRow();
+                row.innerHTML = `<td>${user.name}</td><td>${user.email}</td><td>${user.mobile}</td>
+                                 <td><button onclick="deleteUser(${index})">Delete</button></td>`;
+            });
+        }
+
+        function deleteUser(index) {
+            let users = JSON.parse(localStorage.getItem("users"));
+            users.splice(index, 1);
+            localStorage.setItem("users", JSON.stringify(users));
+            displayUsers();
+        }
+
+        function clearAll() {
+            localStorage.clear();
+            displayUsers();
+        }
+
+        displayUsers();
+
+    </script>
+</body>
+
+</html>
