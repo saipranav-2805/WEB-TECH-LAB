@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Activity Monitor</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 20px; background-color: #f0f2f5; }
+        .dashboard { display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
+        
+        .monitor-area { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .log-panel { background: #333; color: #00ff00; padding: 15px; border-radius: 8px; height: 400px; overflow-y: auto; font-family: monospace; font-size: 13px; }
+        
+
+        .test-zone { margin: 20px 0; padding: 15px; border: 2px dashed #ccc; text-align: center; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ddd; }
+        
+        .warning { color: white; background: #e74c3c; padding: 10px; margin-bottom: 10px; border-radius: 4px; display: none; font-weight: bold; }
+        .controls { margin-top: 15px; }
+        button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; margin-right: 5px; }
+        .btn-reset { background: #95a5a6; color: white; }
+        .btn-export { background: #2ecc71; color: white; }
+        
+        .log-entry { margin-bottom: 4px; border-bottom: 1px solid #444; padding-bottom: 2px; }
+        .tag { font-weight: bold; color: #ffcc00; }
+    </style>
+</head>
+<body>
+
+<div class="dashboard">
+    <div class="monitor-area">
+        <h2>Exercise 4: Activity Monitor</h2>
+        <div id="alertBox" class="warning">⚠️ SUSPICIOUS ACTIVITY DETECTED: Rapid Clicks!</div>
+        
+        <div class="test-zone">
+            <p>Interact here to generate logs:</p>
+            <input type="text" id="testInput" placeholder="Type something...">
+            <button id="testBtn">Click Me Fast</button>
+            <p><small>Clicking the button fast triggers the suspicious activity threshold.</small></p>
+        </div>
+
+        <div class="controls">
+            <button class="btn-reset" onclick="resetLogs()">Reset Log</button>
+            <button class="btn-export" onclick="exportLogs()">Export as Text</button>
+        </div>
+    </div>
+
+    <div>
+        <h3>Live Activity Feed</h3>
+        <div id="logPanel" class="log-panel">
+            <div class="log-entry">> System initialized. Monitoring events...</div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    let activityLog = [];
+    const logPanel = document.getElementById('logPanel');
+    const alertBox = document.getElementById('alertBox');
+    
+    let clickCount = 0;
+    const CLICK_THRESHOLD = 5; 
+    const TIME_WINDOW = 2000;
+
+    function logActivity(type, target, detail = "") {
+        const entry = {
+            timestamp: new Date().toLocaleTimeString(),
+            type: type,
+            target: target,
+            detail: detail
+        };
+
+        activityLog.push(entry);
+
+        const logItem = document.createElement('div');
+        logItem.className = 'log-entry';
+        logItem.innerHTML = `<span class="tag">[${entry.timestamp}]</span> ${type.toUpperCase()} on <span style="color:#3498db">${target}</span> ${detail}`;
+        
+        logPanel.prepend(logItem);
+    }
+
+    
+    document.addEventListener('click', (e) => {
+        logActivity('click', e.target.tagName, `(ID: ${e.target.id || 'none'})`);
+        checkSuspiciousClicks();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        logActivity('keypress', 'window', `(Key: ${e.key})`);
+    });
+
+    document.addEventListener('focus', (e) => {
+        logActivity('focus', e.target.tagName, `(Input Focus)`);
+    }, true);
+
+    function checkSuspiciousClicks() {
+        clickCount++;
+        if (clickCount >= CLICK_THRESHOLD) {
+            alertBox.style.display = 'block';
+            setTimeout(() => alertBox.style.display = 'none', 3000);
+        }
+        
+        setTimeout(() => { clickCount = 0; }, TIME_WINDOW);
+    }
+
+    function resetLogs() {
+        activityLog = [];
+        logPanel.innerHTML = '<div class="log-entry">> Logs cleared.</div>';
+        alertBox.style.display = 'none';
+    }
+
+    function exportLogs() {
+        if (activityLog.length === 0) {
+            alert("No logs to export!");
+            return;
+        }
+        
+        let content = "USER ACTIVITY LOG\n====================\n";
+        activityLog.forEach(log => {
+            content += `[${log.timestamp}] ${log.type} | Target: ${log.target} | ${log.detail}\n`;
+        });
+
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'activity_log.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Stage Form Workflow</title>
+    <style>
+        /* CSS: Styling and Layout */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; padding: 40px; }
+        .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        
+        /* Requirement 3: Progress Bar Styling */
+        .progress-container { width: 100%; background: #e0e0e0; height: 10px; border-radius: 5px; margin-bottom: 30px; overflow: hidden; }
+        .progress-bar { height: 100%; background: #4a90e2; width: 25%; transition: 0.4s ease; }
+
+        /* Requirement 4: DOM Visibility Control */
+        .form-stage { display: none; }
+        .form-stage.active { display: block; animation: fadeIn 0.5s; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h3 { color: #333; margin-top: 0; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .error { color: #e74c3c; font-size: 0.85em; height: 1em; display: block; margin-bottom: 10px; }
+        
+        .controls { display: flex; justify-content: space-between; margin-top: 20px; }
+        button { padding: 10px 25px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        #nextBtn { background-color: #4a90e2; color: white; }
+        #prevBtn { background-color: #95a5a6; color: white; }
+        button:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <form id="workflowForm">
+        <div class="form-stage active">
+            <h3>Stage 1: Account</h3>
+            <label>Username</label>
+            <input type="text" id="username" placeholder="Enter username">
+            <span class="error" id="err-username"></span>
+        </div>
+
+        <div class="form-stage">
+            <h3>Stage 2: Contact</h3>
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="email@example.com">
+            <span class="error" id="err-email"></span>
+        </div>
+
+        <div class="form-stage">
+            <h3>Stage 3: Security</h3>
+            <label>Password</label>
+            <input type="password" id="password" placeholder="At least 8 characters">
+            <span class="error" id="err-password"></span>
+        </div>
+
+        <div class="form-stage">
+            <h3>Stage 4: Finalize</h3>
+            <div id="summary" style="background: #f9f9f9; padding: 10px; border-radius: 4px; margin-bottom: 15px;"></div>
+            <label><input type="checkbox" id="terms"> I accept the terms</label>
+            <span class="error" id="err-terms"></span>
+        </div>
+
+        <div class="controls">
+            <button type="button" id="prevBtn" style="visibility: hidden;">Back</button>
+            <button type="button" id="nextBtn">Next</button>
+        </div>
+    </form>
+</div>
+
+
+
+<script>
+    // JS: The Workflow Engine
+    const stages = document.querySelectorAll(".form-stage");
+    const progressBar = document.getElementById("progressBar");
+    const nextBtn = document.getElementById("nextBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    
+    let currentStage = 0;
+    // Requirement 6: Temporary JS storage
+    let formData = {};
+
+    function updateDisplay() {
+        stages.forEach((stage, idx) => {
+            stage.classList.toggle("active", idx === currentStage);
+        });
+
+        // Requirement 3: Update Progress
+        const progressPercent = ((currentStage + 1) / stages.length) * 100;
+        progressBar.style.width = progressPercent + "%";
+
+        // Navigation Control
+        prevBtn.style.visibility = currentStage === 0 ? "hidden" : "visible";
+        nextBtn.innerText = currentStage === stages.length - 1 ? "Submit" : "Next";
+    }
+
+    function validate() {
+        // Clear previous errors
+        document.querySelectorAll('.error').forEach(el => el.innerText = "");
+        
+        let valid = true;
+        if (currentStage === 0) {
+            const user = document.getElementById("username").value;
+            if (user.length < 3) {
+                document.getElementById("err-username").innerText = "Min 3 characters required";
+                valid = false;
+            } else formData.username = user;
+        } 
+        else if (currentStage === 1) {
+            const email = document.getElementById("email").value;
+            if (!email.match(/\S+@\S+\.\S+/)) {
+                document.getElementById("err-email").innerText = "Enter a valid email";
+                valid = false;
+            } else formData.email = email;
+        }
+        else if (currentStage === 2) {
+            const pass = document.getElementById("password").value;
+            if (pass.length < 8) {
+                document.getElementById("err-password").innerText = "Password too short";
+                valid = false;
+            } else formData.password = pass;
+        }
+        else if (currentStage === 3) {
+            valid = document.getElementById("terms").checked;
+            if (!valid) document.getElementById("err-terms").innerText = "Must agree to proceed";
+        }
+        return valid;
+    }
+
+    nextBtn.addEventListener("click", () => {
+        // Requirement 2 & 5: Strict validation before moving
+        if (validate()) {
+            if (currentStage < stages.length - 1) {
+                currentStage++;
+                if (currentStage === 3) {
+                    document.getElementById("summary").innerText = 
+                        `Confirm details for ${formData.username} (${formData.email})`;
+                }
+                updateDisplay();
+            } else {
+                alert("Success! Form workflow complete.");
+                console.log("Captured Data:", formData);
+            }
+        }
+    });
+
+    prevBtn.addEventListener("click", () => {
+        if (currentStage > 0) {
+            currentStage--;
+            updateDisplay();
+        }
+    });
+</script>
+
+</body>
+</html>

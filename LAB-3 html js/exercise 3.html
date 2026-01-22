@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Survey Builder</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding: 20px; background-color: #f9f9f9; }
+        .survey-container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        .question-block { margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; }
+        input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .error-msg { color: #d9534f; font-size: 0.85em; margin-top: 5px; display: none; }
+        .options-group { display: flex; flex-direction: column; gap: 8px; }
+        button { background-color: #5cb85c; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; }
+        button:hover { background-color: #4cae4c; }
+    </style>
+</head>
+<body>
+
+<div class="survey-container">
+    <h2>Course Feedback Survey</h2>
+    <form id="dynamicSurvey"></form>
+</div>
+
+<script>
+    const surveyData = [
+        { id: "q1", type: "text", label: "Full Name", required: true, minLength: 3 },
+        { id: "q2", type: "radio", label: "How was the lecture?", options: ["Excellent", "Good", "Poor"], required: true },
+        { id: "q3", type: "checkbox", label: "Topics you enjoyed (Select at least 2)", options: ["DOM", "Events", "JSON", "Storage"], minSelect: 2 }
+    ];
+
+    const form = document.getElementById("dynamicSurvey");
+
+    surveyData.forEach(q => {
+        const div = document.createElement("div");
+        div.className = "question-block";
+
+        const label = document.createElement("label");
+        label.innerText = q.label;
+        div.appendChild(label);
+
+        if (q.type === "text") {
+            const input = document.createElement("input");
+            input.type = "text";
+            input.id = q.id;
+            div.appendChild(input);
+        } else {
+            const group = document.createElement("div");
+            group.className = "options-group";
+            q.options.forEach(opt => {
+                const optLabel = document.createElement("label");
+                optLabel.style.fontWeight = "normal";
+                const optInput = document.createElement("input");
+                optInput.type = q.type;
+                optInput.name = q.id;
+                optInput.value = opt;
+                optLabel.prepend(optInput);
+                optLabel.append(opt);
+                group.appendChild(optLabel);
+            });
+            div.appendChild(group);
+        }
+
+        const err = document.createElement("div");
+        err.className = "error-msg";
+        err.id = "err-" + q.id;
+        div.appendChild(err);
+        form.appendChild(div);
+    });
+
+    const submitBtn = document.createElement("button");
+    submitBtn.type = "submit";
+    submitBtn.innerText = "Submit Survey";
+    form.appendChild(submitBtn);
+
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        let isFormValid = true;
+
+        document.querySelectorAll(".error-msg").forEach(m => m.style.display = "none");
+
+        surveyData.forEach(q => {
+            const errorElement = document.getElementById("err-" + q.id);
+            let isValid = true;
+            let message = "";
+
+            if (q.type === "text") {
+                const val = document.getElementById(q.id).value.trim();
+                if (q.required && !val) {
+                    isValid = false;
+                    message = "This field is mandatory.";
+                } else if (q.minLength && val.length < q.minLength) {
+                    isValid = false;
+                    message = `Minimum ${q.minLength} characters required.`;
+                }
+            } 
+            else if (q.type === "radio") {
+                const checked = form.querySelector(`input[name="${q.id}"]:checked`);
+                if (q.required && !checked) {
+                    isValid = false;
+                    message = "Please select an option.";
+                }
+            }
+            else if (q.type === "checkbox") {
+                const checkedCount = form.querySelectorAll(`input[name="${q.id}"]:checked`).length;
+                if (q.minSelect && checkedCount < q.minSelect) {
+                    isValid = false;
+                    message = `Please select at least ${q.minSelect} options.`;
+                }
+            }
+
+            if (!isValid) {
+                errorElement.innerText = message;
+                errorElement.style.display = "block";
+                isFormValid = false;
+            }
+        });
+
+        if (isFormValid) {
+            alert("Survey submitted successfully!");
+            form.reset();
+        }
+    });
+</script>
+
+</body>
+</html>

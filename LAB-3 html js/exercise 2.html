@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Intelligent Shopping Cart</title>
+    <style>
+        body { font-family: sans-serif; background: #f0f2f5; padding: 20px; }
+        .cart-container { background: white; max-width: 600px; margin: auto; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .product-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; }
+        .totals { margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; }
+        .coupon-section { margin-top: 15px; display: flex; gap: 10px; }
+        input[type="text"] { flex-grow: 1; padding: 8px; }
+        button { cursor: pointer; padding: 8px 15px; border: none; border-radius: 4px; background: #3498db; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="cart-container">
+    <h2>Your Shopping Cart</h2>
+    <div id="cartItems"></div>
+    
+    <div class="coupon-section">
+        <input type="text" id="couponInput" placeholder="Enter Coupon (e.g. SAVE10)">
+        <button onclick="applyCoupon()">Apply</button>
+    </div>
+
+    <div class="totals">
+        <p>Subtotal: <span id="subtotal">₹0.00</span></p>
+        <p>Discounts Applied: <span id="discounts">None</span></p>
+        <h3>Final Total: <span id="finalTotal">₹0.00</span></h3>
+    </div>
+</div>
+
+<script>
+    let products = [
+        { id: 1, name: "Laptop", price: 85000, quantity: 1, category: "Electronics" },
+        { id: 2, name: "Headphones", price: 15000, quantity: 1, category: "Electronics" },
+        { id: 3, name: "T-Shirt", price: 1500, quantity: 5, category: "Apparel" }
+    ];
+
+    let activeCoupon = null;
+
+    function renderCart() {
+        const cartDiv = document.getElementById("cartItems");
+        cartDiv.innerHTML = "";
+        let subtotal = 0;
+
+        products.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            subtotal += itemTotal;
+
+            const div = document.createElement("div");
+            div.className = "product-item";
+            div.innerHTML = `
+                <div>
+                    <strong>${item.name}</strong> (₹${item.price})
+                    <br><small>Category: ${item.category}</small>
+                </div>
+                <div>
+                    <button onclick="updateQty(${item.id}, -1)">-</button>
+                    <span>${item.quantity}</span>
+                    <button onclick="updateQty(${item.id}, 1)">+</button>
+                    <strong>₹${itemTotal}</strong>
+                </div>
+            `;
+            cartDiv.appendChild(div);
+        });
+
+        calculatePrices(subtotal);
+    }
+
+    function updateQty(id, change) {
+        const product = products.find(p => p.id === id);
+        if (product) {
+            product.quantity = Math.max(0, product.quantity + change);
+            if (product.quantity === 0) {
+                products = products.filter(p => p.id !== id);
+            }
+            renderCart();
+        }
+    }
+
+    function calculatePrices(subtotal) {
+        let discountAmount = 0;
+        let discountNames = [];
+
+        const totalItems = products.reduce((sum, p) => sum + p.quantity, 0);
+        if (totalItems >= 10) {
+            discountAmount += subtotal * 0.1;
+            discountNames.push("Bulk 10%");
+        }
+
+        const electronicsTotal = products
+            .filter(p => p.category === "Electronics")
+            .reduce((sum, p) => sum + (p.price * p.quantity), 0);
+        if (electronicsTotal > 50000) {
+            discountAmount += 4000;
+            discountNames.push("Electronics Credit -₹4000");
+        }
+
+        const hour = new Date().getHours();
+        if (hour >= 16 && hour <= 18) {
+            discountAmount += subtotal * 0.05;
+            discountNames.push("Happy Hour 5%");
+        }
+
+        if (activeCoupon === "SAVE10") {
+            discountAmount += subtotal * 0.1;
+            discountNames.push("Coupon SAVE10");
+        }
+
+        const final = Math.max(0, subtotal - discountAmount);
+        
+        document.getElementById("subtotal").innerText = `₹${final.toLocaleString('en-IN')}`;
+        document.getElementById("discounts").innerText = discountNames.length > 0 ? discountNames.join(", ") : "None";
+        document.getElementById("finalTotal").innerText = `₹${final.toLocaleString('en-IN')}`;
+    }
+
+    function applyCoupon() {
+        const code = document.getElementById("couponInput").value.trim().toUpperCase();
+        if (code === "SAVE10") {
+            activeCoupon = code;
+            alert("Coupon Applied!");
+        } else {
+            alert("Invalid Coupon");
+            activeCoupon = null;
+        }
+        renderCart();
+    }
+
+    renderCart();
+</script>
+</body>
+</html>
