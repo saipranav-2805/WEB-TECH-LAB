@@ -1,0 +1,62 @@
+[
+    {
+        "id": 1,
+        "name": "Apple",
+        "price": 1.50,
+        "category": "Fruit"
+    },
+    {
+        "id": 2,
+        "name": "Banana",
+        "price": 0.50,
+        "category": "Fruit"
+    },
+    {
+        "id": 3,
+        "name": "Orange",
+        "price": 1.20,
+        "category": "Fruit"
+    },
+    {
+        "id": 4,
+        "name": "Milk",
+        "price": 2.50,
+        "category": "Dairy"
+    },
+    {
+        "id": 5,
+        "name": "Bread",
+        "price": 2.00,
+        "category": "Bakery"
+    },
+    {
+        "id": 6,
+        "name": "Cheese",
+        "price": 5.00,
+        "category": "Dairy"
+    },
+    {
+        "id": 7,
+        "name": "Chicken",
+        "price": 8.00,
+        "category": "Meat"
+    },
+    {
+        "id": 8,
+        "name": "Beef",
+        "price": 12.00,
+        "category": "Meat"
+    },
+    {
+        "id": 9,
+        "name": "Laptop",
+        "price": 999.99,
+        "category": "Electronics"
+    },
+    {
+        "id": 10,
+        "name": "Mouse",
+        "price": 25.00,
+        "category": "Electronics"
+    }
+]

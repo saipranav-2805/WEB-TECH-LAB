@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<library>
+    <book>
+        <id>101</id>
+        <title>Breaking Bad</title>
+        <author>Vince Gilligan</author>
+        <status>Available</status>
+    </book>
+    <book>
+        <id>102</id>
+        <title>Game of Thrones</title>
+        <author>George R. R. Martin</author>
+        <status>Issued</status>
+    </book>
+    <book>
+        <id>103</id>
+        <title>The Witcher</title>
+        <author>Andrzej Sapkowski</author>
+        <status>Available</status>
+    </book>
+</library>

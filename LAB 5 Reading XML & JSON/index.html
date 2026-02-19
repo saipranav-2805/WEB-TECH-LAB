@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Employee Management System</title>
+</head>
+
+<body>
+
+    <div id="exercise1">
+        <h2>Exercise 1: Employee Management System</h2>
+
+        <button onclick="loadEmployees()">Load Employees</button>
+        <br><br>
+
+        <table border="1" id="empTable">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Salary</th>
+                <th>Actions</th>
+            </tr>
+        </table>
+
+        <h3>Add / Update Employee</h3>
+
+        <label>ID:</label>
+        <input type="text" id="empId"><br><br>
+
+        <label>Name:</label>
+        <input type="text" id="empName"><br><br>
+
+        <label>Department:</label>
+        <input type="text" id="empDept"><br><br>
+
+        <label>Salary:</label>
+        <input type="text" id="empSalary"><br><br>
+
+        <button onclick="addEmployee()">Add Employee</button>
+        <button onclick="updateEmployee()">Update Employee</button>
+
+        <p id="message"></p>
+    </div>
+
+    <br><br>
+    <div id="exercise2">
+        <h2>Exercise 2: Library Book Tracker</h2>
+
+        <button onclick="loadBooks()">Load Books</button>
+        <br><br>
+
+        <table border="1" id="bookTable">
+            <tr>
+                <th>Book ID</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </table>
+
+        <h3>Add / Update Book</h3>
+
+        <label>Book ID:</label>
+        <input type="text" id="bookId"><br><br>
+
+        <label>Title:</label>
+        <input type="text" id="bookTitle"><br><br>
+
+        <label>Author:</label>
+        <input type="text" id="bookAuthor"><br><br>
+
+        <label>Status:</label>
+        <input type="text" id="bookStatus"><br><br>
+
+        <button onclick="addBook()">Add Book</button>
+        <button onclick="updateBook()">Update Status</button>
+
+        <p id="bookMessage"></p>
+    </div>
+    <br><br>
+    <div id="exercise3">
+        <h2>Exercise 3: Student Record System</h2>
+
+        <button onclick="loadStudents()">Load Students</button>
+        <br><br>
+
+        <table border="1" id="studentTable">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Course</th>
+                <th>Marks</th>
+                <th>Actions</th>
+            </tr>
+        </table>
+
+        <h3>Add / Update Student</h3>
+
+        <label>ID:</label>
+        <input type="text" id="stuId"><br><br>
+
+        <label>Name:</label>
+        <input type="text" id="stuName"><br><br>
+
+        <label>Course:</label>
+        <input type="text" id="stuCourse"><br><br>
+
+        <label>Marks:</label>
+        <input type="number" id="stuMarks"><br><br>
+
+        <button onclick="addStudent()">Add Student</button>
+        <button onclick="updateStudent()">Update Student</button>
+
+        <p id="studentMessage"></p>
+    </div>
+    <br><br>
+    <div id="exercise4">
+        <h2>Exercise 4: Product Inventory System</h2>
+
+        <button onclick="loadInventory()">Load Inventory</button>
+        <br><br>
+
+        <label>Search by Category:</label>
+        <input type="text" id="searchCategory">
+        <button onclick="searchByCategory()">Search</button>
+        <button onclick="displayInventory()">Show All</button>
+        <br><br>
+
+        <table border="1" id="inventoryTable">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Note</th>
+                <th>Actions</th>
+            </tr>
+        </table>
+
+        <h3>Add / Update Product</h3>
+
+        <label>Product ID:</label>
+        <input type="text" id="prodId"><br><br>
+
+        <label>Name:</label>
+        <input type="text" id="prodName"><br><br>
+
+        <label>Category:</label>
+        <input type="text" id="prodCategory"><br><br>
+
+        <label>Price:</label>
+        <input type="number" id="prodPrice"><br><br>
+
+        <label>Stock:</label>
+        <input type="number" id="prodStock"><br><br>
+
+        <button onclick="addProduct()">Add Product</button>
+        <button onclick="updateProduct()">Update Product</button>
+
+        <p><strong>Total Inventory Value:</strong> <span id="totalValue">0</span></p>
+        <p id="inventoryMessage"></p>
+    </div>
+
+    <script>
+        let xmlDoc = null;
+
+        function loadEmployees() {
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", "employees.xml", true);
+            xhr.send();
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    try {
+                        xmlDoc = xhr.responseXML;
+                        if (!xmlDoc) {
+                            throw "Invalid XML";
+                        }
+                        displayEmployees();
+                        showMessage("Employees loaded successfully", false);
+                    } catch (e) {
+                        showMessage("Error parsing XML", true);
+                    }
+                } else {
+                    showMessage("Failed to load XML file", true);
+                }
+            };
+        }
+
+        function displayEmployees() {
+            let table = document.getElementById("empTable");
+
+            // Remove old rows
+            while (table.rows.length > 1) {
+                table.deleteRow(1);
+            }
+
+            let employees = xmlDoc.getElementsByTagName("employee");
+
+            if (employees.length === 0) {
+                showMessage("No employee records found", true);
+                return;
+            }
+
+            for (let i = 0; i < employees.length; i++) {
+                let row = table.insertRow();
+
+                let id = employees[i].getElementsByTagName("id")[0].textContent;
+                let name = employees[i].getElementsByTagName("name")[0].textContent;
+                let dept = employees[i].getElementsByTagName("department")[0].textContent;
+                let salary = employees[i].getElementsByTagName("salary")[0].textContent;
+
+                row.insertCell(0).innerHTML = id;
+                row.insertCell(1).innerHTML = name;
+                row.insertCell(2).innerHTML = dept;
+                row.insertCell(3).innerHTML = salary;
+
+                let actionCell = row.insertCell(4);
+                let delBtn = document.createElement("button");
+                delBtn.innerHTML = "Delete";
+                delBtn.onclick = function () {
+                    deleteEmployee(id);
+                };
+                actionCell.appendChild(delBtn);
+            }
+        }
+
+        function addEmployee() {
+            if (!xmlDoc) {
+                showMessage("Load XML first", true);
+                return;
+            }
+
+            let id = empId.value;
+            let name = empName.value;
+            let dept = empDept.value;
+            let salary = empSalary.value;
+
+            if (id === "" || name === "" || dept === "" || salary === "") {
+                showMessage("All fields are required", true);
+                return;
+            }
+
+            let newEmp = xmlDoc.createElement("employee");
+
+            let idNode = xmlDoc.createElement("id");
+            idNode.textContent = id;
+
+            let nameNode = xmlDoc.createElement("name");
+            nameNode.textContent = name;
+
+            let deptNode = xmlDoc.createElement("department");
+            deptNode.textContent = dept;
+
+            let salNode = xmlDoc.createElement("salary");
+            salNode.textContent = salary;
+
+            newEmp.appendChild(idNode);
+            newEmp.appendChild(nameNode);
+            newEmp.appendChild(deptNode);
+            newEmp.appendChild(salNode);
+
+            xmlDoc.getElementsByTagName("employees")[0].appendChild(newEmp);
+
+            displayEmployees();
+            showMessage("Employee added successfully", false);
+        }
+
+        function updateEmployee() {
+            let id = empId.value;
+            let employees = xmlDoc.getElementsByTagName("employee");
+
+            for (let i = 0; i < employees.length; i++) {
+                let empIdNode = employees[i].getElementsByTagName("id")[0].textContent;
+
+                if (empIdNode === id) {
+                    employees[i].getElementsByTagName("department")[0].textContent = empDept.value;
+                    employees[i].getElementsByTagName("salary")[0].textContent = empSalary.value;
+
+                    displayEmployees();
+                    showMessage("Employee updated successfully", false);
+                    return;
+                }
+            }
+
+            showMessage("Employee not found", true);
+        }
+
+        function deleteEmployee(id) {
+            let employees = xmlDoc.getElementsByTagName("employee");
+
+            for (let i = 0; i < employees.length; i++) {
+                let empIdNode = employees[i].getElementsByTagName("id")[0].textContent;
+
+                if (empIdNode === id) {
+                    xmlDoc.getElementsByTagName("employees")[0].removeChild(employees[i]);
+                    displayEmployees();
+                    showMessage("Employee deleted successfully", false);
+                    return;
+                }
+            }
+        }
+
+        function showMessage(msg, isError) {
+            let message = document.getElementById("message");
+            message.innerHTML = msg;
+            message.style.color = isError ? "red" : "green";
+        }
+        //Exercise 2
+        let bookXml = null;
+
+        function loadBooks() {
+            let xhr = new XMLHttpRequest();
+            xhr.open("GET", "books.xml", true);
+            xhr.send();
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    bookXml = xhr.responseXML;
+
+                    if (!bookXml) {
+                        showBookMessage("Invalid or empty XML", true);
+                        return;
+                    }
+
+                    displayBooks();
+                    showBookMessage("Books loaded successfully", false);
+                } else {
+                    showBookMessage("Failed to load books XML", true);
+                }
+            };
+        }
+
+        function displayBooks() {
+            let table = document.getElementById("bookTable");
+
+            while (table.rows.length > 1) {
+                table.deleteRow(1);
+            }
+
+            let books = bookXml.getElementsByTagName("book");
+
+            for (let i = 0; i < books.length; i++) {
+                let row = table.insertRow();
+
+                let id = books[i].getElementsByTagName("id")[0].textContent;
+                let title = books[i].getElementsByTagName("title")[0].textContent;
+                let author = books[i].getElementsByTagName("author")[0].textContent;
+                let status = books[i].getElementsByTagName("status")[0].textContent;
+
+                row.insertCell(0).innerHTML = id;
+                row.insertCell(1).innerHTML = title;
+                row.insertCell(2).innerHTML = author;
+                row.insertCell(3).innerHTML = status;
+
+                let btn = document.createElement("button");
+                btn.innerHTML = "Delete";
+                btn.onclick = function () {
+                    deleteBook(id);
+                };
+
+                row.insertCell(4).appendChild(btn);
+            }
+        }
+
+        function addBook() {
+            if (!bookXml) {
+                showBookMessage("Load books first", true);
+                return;
+            }
+
+            let id = bookId.value;
+            let title = bookTitle.value;
+            let author = bookAuthor.value;
+            let status = bookStatus.value;
+
+            if (id === "" || title === "" || author === "" || status === "") {
+                showBookMessage("All fields are required", true);
+                return;
+            }
+
+            let book = bookXml.createElement("book");
+
+            let idNode = bookXml.createElement("id");
+            idNode.textContent = id;
+
+            let titleNode = bookXml.createElement("title");
+            titleNode.textContent = title;
+
+            let authorNode = bookXml.createElement("author");
+            authorNode.textContent = author;
+
+            let statusNode = bookXml.createElement("status");
+            statusNode.textContent = status;
+
+            book.appendChild(idNode);
+            book.appendChild(titleNode);
+            book.appendChild(authorNode);
+            book.appendChild(statusNode);
+
+            bookXml.getElementsByTagName("library")[0].appendChild(book);
+
+            displayBooks();
+            showBookMessage("Book added successfully", false);
+        }
+
+        function updateBook() {
+            let id = bookId.value;
+            let books = bookXml.getElementsByTagName("book");
+
+            for (let i = 0; i < books.length; i++) {
+                if (books[i].getElementsByTagName("id")[0].textContent === id) {
+                    books[i].getElementsByTagName("status")[0].textContent = bookStatus.value;
+
+                    displayBooks();
+                    showBookMessage("Book status updated", false);
+                    return;
+                }
+            }
+
+            showBookMessage("Book not found", true);
+        }
+
+        function deleteBook(id) {
+            let books = bookXml.getElementsByTagName("book");
+
+            for (let i = 0; i < books.length; i++) {
+                if (books[i].getElementsByTagName("id")[0].textContent === id) {
+                    bookXml.getElementsByTagName("library")[0].removeChild(books[i]);
+                    displayBooks();
+                    showBookMessage("Book deleted successfully", false);
+                    return;
+                }
+            }
+        }
+
+        function showBookMessage(msg, isError) {
+            let p = document.getElementById("bookMessage");
+            p.innerHTML = msg;
+            p.style.color = isError ? "red" : "green";
+        }
+
+        //exercise 3
+        let studentData = null;
+
+        function loadStudents() {
+            fetch("students.json")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Fetch failed");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    studentData = data;
+                    displayStudents();
+                    showStudentMessage("Students loaded successfully", false);
+                })
+                .catch(error => {
+                    showStudentMessage("Error loading or parsing JSON", true);
+                });
+        }
+
+        function displayStudents() {
+            let table = document.getElementById("studentTable");
+
+            while (table.rows.length > 1) {
+                table.deleteRow(1);
+            }
+
+            let students = studentData.students;
+
+            if (students.length === 0) {
+                showStudentMessage("No student records found", true);
+                return;
+            }
+
+            for (let i = 0; i < students.length; i++) {
+                let row = table.insertRow();
+
+                row.insertCell(0).innerHTML = students[i].id;
+                row.insertCell(1).innerHTML = students[i].name;
+                row.insertCell(2).innerHTML = students[i].course;
+                row.insertCell(3).innerHTML = students[i].marks;
+
+                let btn = document.createElement("button");
+                btn.innerHTML = "Delete";
+                btn.onclick = function () {
+                    deleteStudent(students[i].id);
+                };
+
+                row.insertCell(4).appendChild(btn);
+            }
+        }
+
+        function addStudent() {
+            if (!studentData) {
+                showStudentMessage("Load students first", true);
+                return;
+            }
+
+            let id = stuId.value;
+            let name = stuName.value;
+            let course = stuCourse.value;
+            let marks = stuMarks.value;
+
+            if (id === "" || name === "" || course === "" || marks === "") {
+                showStudentMessage("All fields are required", true);
+                return;
+            }
+
+            studentData.students.push({
+                id: id,
+                name: name,
+                course: course,
+                marks: parseInt(marks)
+            });
+
+            displayStudents();
+            showStudentMessage("Student added successfully", false);
+        }
+
+        function updateStudent() {
+            let id = stuId.value;
+
+            for (let i = 0; i < studentData.students.length; i++) {
+                if (studentData.students[i].id === id) {
+                    studentData.students[i].course = stuCourse.value;
+                    studentData.students[i].marks = parseInt(stuMarks.value);
+
+                    displayStudents();
+                    showStudentMessage("Student updated successfully", false);
+                    return;
+                }
+            }
+
+            showStudentMessage("Student not found", true);
+        }
+
+        function deleteStudent(id) {
+            for (let i = 0; i < studentData.students.length; i++) {
+                if (studentData.students[i].id === id) {
+                    studentData.students.splice(i, 1);
+                    displayStudents();
+                    showStudentMessage("Student deleted successfully", false);
+                    return;
+                }
+            }
+        }
+
+        function showStudentMessage(msg, isError) {
+            let p = document.getElementById("studentMessage");
+            p.innerHTML = msg;
+            p.style.color = isError ? "red" : "green";
+        }
+        //Exercise 4
+        let inventoryData = null;
+
+        function loadInventory() {
+            fetch("inventory.json")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Fetch failed");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    inventoryData = data;
+                    displayInventory();
+                    showInventoryMessage("Inventory loaded successfully", false);
+                })
+                .catch(() => {
+                    showInventoryMessage("Error loading inventory JSON", true);
+                });
+        }
+
+        function displayInventory(list) {
+            let table = document.getElementById("inventoryTable");
+
+            while (table.rows.length > 1) {
+                table.deleteRow(1);
+            }
+
+            let products = list || inventoryData.products;
+            let total = 0;
+
+            for (let i = 0; i < products.length; i++) {
+                let row = table.insertRow();
+
+                row.insertCell(0).innerHTML = products[i].id;
+                row.insertCell(1).innerHTML = products[i].name;
+                row.insertCell(2).innerHTML = products[i].category;
+                row.insertCell(3).innerHTML = products[i].price;
+                row.insertCell(4).innerHTML = products[i].stock;
+
+                let note = products[i].stock < 5 ? "Low Stock" : "OK";
+                row.insertCell(5).innerHTML = note;
+
+                let btn = document.createElement("button");
+                btn.innerHTML = "Delete";
+                btn.onclick = function () {
+                    deleteProduct(products[i].id);
+                };
+
+                row.insertCell(6).appendChild(btn);
+
+                total += products[i].price * products[i].stock;
+            }
+
+            document.getElementById("totalValue").innerHTML = total;
+        }
+
+        function addProduct() {
+            if (!inventoryData) {
+                showInventoryMessage("Load inventory first", true);
+                return;
+            }
+
+            let id = prodId.value;
+            let name = prodName.value;
+            let category = prodCategory.value;
+            let price = prodPrice.value;
+            let stock = prodStock.value;
+
+            if (id === "" || name === "" || category === "" || price === "" || stock === "") {
+                showInventoryMessage("All fields are required", true);
+                return;
+            }
+
+            inventoryData.products.push({
+                id: id,
+                name: name,
+                category: category,
+                price: parseInt(price),
+                stock: parseInt(stock)
+            });
+
+            displayInventory();
+            showInventoryMessage("Product added successfully", false);
+        }
+
+        function updateProduct() {
+            let id = prodId.value;
+
+            for (let i = 0; i < inventoryData.products.length; i++) {
+                if (inventoryData.products[i].id === id) {
+                    inventoryData.products[i].price = parseInt(prodPrice.value);
+                    inventoryData.products[i].stock = parseInt(prodStock.value);
+
+                    displayInventory();
+                    showInventoryMessage("Product updated successfully", false);
+                    return;
+                }
+            }
+
+            showInventoryMessage("Product not found", true);
+        }
+
+        function deleteProduct(id) {
+            for (let i = 0; i < inventoryData.products.length; i++) {
+                if (inventoryData.products[i].id === id) {
+                    inventoryData.products.splice(i, 1);
+                    displayInventory();
+                    showInventoryMessage("Product deleted successfully", false);
+                    return;
+                }
+            }
+        }
+
+        function searchByCategory() {
+            let category = searchCategory.value.toLowerCase();
+            let filtered = inventoryData.products.filter(p =>
+                p.category.toLowerCase() === category
+            );
+            displayInventory(filtered);
+        }
+
+        function showInventoryMessage(msg, isError) {
+            let p = document.getElementById("inventoryMessage");
+            p.innerHTML = msg;
+            p.style.color = isError ? "red" : "green";
+        }
+    </script>
+
+</body>
+
+</html>

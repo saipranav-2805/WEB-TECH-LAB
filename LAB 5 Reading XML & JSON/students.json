@@ -1,0 +1,22 @@
+{
+    "students": [
+        {
+            "id": "S1",
+            "name": "Sahajit",
+            "course": "Computer Science",
+            "marks": 85
+        },
+        {
+            "id": "S2",
+            "name": "Hritam",
+            "course": "Information Technology",
+            "marks": 78
+        },
+        {
+            "id": "S3",
+            "name": "Sayan",
+            "course": "Computer Science",
+            "marks": 90
+        }
+    ]
+}

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Username Availability Checker</title>
+</head>
+
+<body>
+    <div
+        style="display: flex; justify-content: space-around; align-items: flex-start; border: 1px solid black; width: 70%; margin: auto; padding: 20px;">
+        <div id='form-container'
+            style="display: flex;flex-direction: column;align-items: center;justify-content: center;">
+            <h1>Exercise 1</h1>
+            <h2>Realtime username availability checker</h2>
+            <form id="registrationForm">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+                <span id="availability-status"></span>
+                <br><br>
+                <button type="submit" id="submitBtn">Register</button>
+            </form>
+        </div>
+        <div id='unavailable-usernames'
+            style="display: flex;flex-direction: column;align-items: center;justify-content: center;">
+            <h3>Unavailable usernames</h3>
+            <ul>
+                <li>mkl</li>
+                <li>jane_smith</li>
+                <li>admin</li>
+                <li>user123</li>
+                <li>test_user</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="text-align: center;border: 1px solid black;width: 50%;margin: auto; margin-top: 20px;">
+        <h1>Exercise 2</h1>
+        <h2>AJAX-Based Product Search System</h2>
+        <input type="text" id="search-input" placeholder="Search products...">
+        <div id="list of product" style="display:grid;grid-template-columns: repeat(2, 1fr);">
+            <ul style="list-style-type: none;">
+                <li>Apple</li>
+                <li>Banana</li>
+                <li>Orange</li>
+                <li>Milk</li>
+                <li>Bread</li>
+                <li>Cheese</li>
+                <li>Chicken</li>
+                <li>Beef</li>
+                <li>Laptop</li>
+                <li>Mouse</li>
+            </ul>
+        </div>
+        <div id="search-results"></div>
+    </div>
+
+    </div>
+
+    <!-- Exercise 3: Student Management System -->
+    <div style="text-align: center;border: 1px solid black;width: 60%;margin: auto; margin-top: 20px; padding: 20px;">
+        <h1>Exercise 3</h1>
+        <h2>Student Management System (AJAX CRUD)</h2>
+
+        <!-- Student Form -->
+        <div style="margin-bottom: 20px;">
+            <input type="text" id="studentId" placeholder="Student ID" required>
+            <input type="text" id="studentName" placeholder="Name" required>
+            <input type="text" id="studentDept" placeholder="Department" required>
+            <input type="number" id="studentMarks" placeholder="Marks" required>
+            <button onclick="addStudent()">Add Student</button>
+            <button onclick="updateStudent()" id="updateBtn" style="display:none;">Update Student</button>
+        </div>
+
+        <!-- Student Table -->
+        <table border="1" style="margin: auto; width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Department</th>
+                    <th>Marks</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="studentTableBody">
+                <!-- Rows will be added here dynamically -->
+            </tbody>
+        </table>
+        <p id="crud-message" style="margin-top: 10px; font-weight: bold;"></p>
+    </div>
+
+    <!-- Exercise 4: Weather Dashboard -->
+    <div
+        style="text-align: center; border: 1px solid black; width: 60%; margin: auto; margin-top: 20px; padding: 20px;">
+        <h1>Exercise 4</h1>
+        <h2>Weather Information Dashboard</h2>
+        <input type="text" id="cityInput" placeholder="Enter city name">
+        <button onclick="getWeather()">Get Weather</button>
+        <div id="weatherResult" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        document.getElementById('username').addEventListener('input', function () {
+            var username = this.value;
+            var statusSpan = document.getElementById('availability-status');
+            var submitBtn = document.getElementById('submitBtn');
+
+            if (username.length === 0) {
+                statusSpan.innerHTML = "";
+                submitBtn.disabled = false;
+                return;
+            }
+
+            statusSpan.style.color = "blue";
+            statusSpan.innerHTML = "Checking...";
+            submitBtn.disabled = true;
+
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'users.json', true);
+
+            xhr.onload = function () {
+                if (this.status === 200) {
+                    var users = JSON.parse(this.responseText);
+
+
+                    if (users.includes(username)) {
+                        statusSpan.style.color = "red";
+                        statusSpan.innerHTML = "Username already taken";
+                        submitBtn.disabled = true;
+                    } else {
+                        statusSpan.style.color = "green";
+                        statusSpan.innerHTML = "Username available";
+                        submitBtn.disabled = false;
+                    }
+                }
+            };
+
+            xhr.send();
+        });
+
+        document.getElementById('registrationForm').addEventListener('submit', function (e) {
+            var statusSpan = document.getElementById('availability-status');
+            if (statusSpan.innerHTML === "Username already taken") {
+                e.preventDefault();
+                alert("Please choose a different username.");
+            } else {
+                alert("Registration successful!");
+            }
+        });
+
+        // Exercise 2 Logic
+        var debounceTimer;
+        document.getElementById('search-input').addEventListener('input', function () {
+            var query = this.value.toLowerCase();
+            var resultsDiv = document.getElementById('search-results');
+
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function () {
+                if (query.trim() === "") {
+                    resultsDiv.innerHTML = "";
+                    return;
+                }
+
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', 'products.json', true);
+
+                xhr.onload = function () {
+                    if (this.status === 200) {
+                        var products = JSON.parse(this.responseText);
+                        var filteredProducts = products.filter(function (product) {
+                            return product.name.toLowerCase().includes(query);
+                        });
+
+                        if (filteredProducts.length > 0) {
+                            var output = '<table border="1" style="margin: auto; margin-top: 10px; width: 80%;"><tr><th>Name</th><th>Price</th><th>Category</th></tr>';
+                            filteredProducts.forEach(function (product) {
+                                output += '<tr><td>' + product.name + '</td><td>$' + product.price + '</td><td>' + product.category + '</td></tr>';
+                            });
+                            output += '</table>';
+                            resultsDiv.innerHTML = output;
+                        } else {
+                            resultsDiv.innerHTML = "<p>No results found</p>";
+                        }
+                    }
+                };
+
+                xhr.onerror = function () {
+                    resultsDiv.innerHTML = "<p>Error fetching data</p>";
+                };
+
+                xhr.send();
+            }, 300); // Debounce delay
+        });
+
+        // Exercise 3 Logic: Student Management System
+        var students = []; // Local array to simulate database
+
+        // Load initial data from JSON
+        function loadStudents() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'students.json', true);
+            xhr.onload = function () {
+                if (this.status === 200) {
+                    students = JSON.parse(this.responseText);
+                    renderTable();
+                }
+            };
+            xhr.send();
+        }
+
+        // Render Table
+        function renderTable() {
+            var tableBody = document.getElementById('studentTableBody');
+            tableBody.innerHTML = "";
+            students.forEach(function (student) {
+                var row = "<tr>" +
+                    "<td>" + student.id + "</td>" +
+                    "<td>" + student.name + "</td>" +
+                    "<td>" + student.department + "</td>" +
+                    "<td>" + student.marks + "</td>" +
+                    "<td>" +
+                    "<button onclick='editStudent(\"" + student.id + "\")'>Edit</button> " +
+                    "<button onclick='deleteStudent(\"" + student.id + "\")'>Delete</button>" +
+                    "</td>" +
+                    "</tr>";
+                tableBody.innerHTML += row;
+            });
+        }
+
+        // Create: Add Student
+        function addStudent() {
+            var id = document.getElementById('studentId').value;
+            var name = document.getElementById('studentName').value;
+            var dept = document.getElementById('studentDept').value;
+            var marks = document.getElementById('studentMarks').value;
+
+            if (id && name && dept && marks) {
+                // Check for duplicate ID
+                if (students.some(s => s.id === id)) {
+                    showMessage("Error: Student ID already exists!", "red");
+                    return;
+                }
+
+                var newStudent = { id: id, name: name, department: dept, marks: marks };
+                students.push(newStudent);
+                renderTable();
+                clearForm();
+                showMessage("Student added successfully!", "green");
+            } else {
+                showMessage("Please fill all fields.", "red");
+            }
+        }
+
+        // Read/Update: Edit Student (Populate Form)
+        function editStudent(id) {
+            var student = students.find(s => s.id === id);
+            if (student) {
+                document.getElementById('studentId').value = student.id;
+                document.getElementById('studentName').value = student.name;
+                document.getElementById('studentDept').value = student.department;
+                document.getElementById('studentMarks').value = student.marks;
+
+                document.getElementById('studentId').disabled = true; // ID cannot be changed during update
+                document.getElementById('updateBtn').style.display = "inline";
+                document.querySelector('button[onclick="addStudent()"]').style.display = "none";
+                showMessage("Editing student: " + student.name, "blue");
+            }
+        }
+
+        // Update: Save Changes
+        function updateStudent() {
+            var id = document.getElementById('studentId').value;
+            var name = document.getElementById('studentName').value;
+            var dept = document.getElementById('studentDept').value;
+            var marks = document.getElementById('studentMarks').value;
+
+            var index = students.findIndex(s => s.id === id);
+            if (index !== -1) {
+                students[index] = { id: id, name: name, department: dept, marks: marks };
+                renderTable();
+                clearForm();
+                showMessage("Student updated successfully!", "green");
+            }
+        }
+
+        // Delete: Remove Student
+        function deleteStudent(id) {
+            if (confirm("Are you sure you want to delete this student?")) {
+                students = students.filter(s => s.id !== id);
+                renderTable();
+                showMessage("Student deleted successfully!", "green");
+            }
+        }
+
+        // Helper: Clear Form
+        function clearForm() {
+            document.getElementById('studentId').value = "";
+            document.getElementById('studentName').value = "";
+            document.getElementById('studentDept').value = "";
+            document.getElementById('studentMarks').value = "";
+            document.getElementById('studentId').disabled = false;
+            document.getElementById('updateBtn').style.display = "none";
+            document.querySelector('button[onclick="addStudent()"]').style.display = "inline";
+        }
+
+        // Helper: Show Message
+        function showMessage(msg, color) {
+            var msgElement = document.getElementById('crud-message');
+            msgElement.innerHTML = msg;
+            msgElement.style.color = color;
+            setTimeout(function () { msgElement.innerHTML = ""; }, 3000);
+        }
+
+        // Initialize
+        loadStudents();
+
+        // Exercise 4 Logic: Weather Dashboard
+        var lastSearchedCity = "";
+        var lastWeatherData = null;
+
+        function getWeather() {
+            var city = document.getElementById('cityInput').value;
+            var resultDiv = document.getElementById('weatherResult');
+
+            if (!city) {
+                alert("Please enter a city name");
+                return;
+            }
+
+            // Check if same city as last time
+            if (city.toLowerCase() === lastSearchedCity.toLowerCase() && lastWeatherData) {
+                displayWeather(lastWeatherData);
+                return;
+            }
+
+            resultDiv.innerHTML = "Loading...";
+
+            // 1. Geocoding API to get Lat/Lon
+            var geoXhr = new XMLHttpRequest();
+            var geoUrl = 'https://geocoding-api.open-meteo.com/v1/search?name=' + city + '&count=1&language=en&format=json';
+
+            geoXhr.open('GET', geoUrl, true);
+
+            geoXhr.onload = function () {
+                if (this.status === 200) {
+                    var data = JSON.parse(this.responseText);
+                    if (data.results && data.results.length > 0) {
+                        var lat = data.results[0].latitude;
+                        var lon = data.results[0].longitude;
+                        var cityName = data.results[0].name; // Use API provided name for display
+                        fetchWeatherData(lat, lon, cityName);
+                    } else {
+                        resultDiv.innerHTML = "City not found.";
+                    }
+                } else {
+                    resultDiv.innerHTML = "Error finding city. Status: " + this.status;
+                }
+            };
+
+            geoXhr.onerror = function () {
+                resultDiv.innerHTML = "Network error during geocoding.";
+            };
+
+            geoXhr.send();
+        }
+
+        function fetchWeatherData(lat, lon, cityName) {
+            var resultDiv = document.getElementById('weatherResult');
+            // 2. Weather API
+            var weatherXhr = new XMLHttpRequest();
+            // Fetching temp and humidity (using relative_humidity_2m)
+            var weatherUrl = 'https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current=temperature_2m,relative_humidity_2m,weather_code';
+
+            weatherXhr.open('GET', weatherUrl, true);
+
+            weatherXhr.onload = function () {
+                if (this.status === 200) {
+                    var data = JSON.parse(this.responseText);
+                    var current = data.current;
+
+                    var weatherInfo = {
+                        city: cityName,
+                        temp: current.temperature_2m,
+                        humidity: current.relative_humidity_2m,
+                        condition: getWeatherCondition(current.weather_code)
+                    };
+
+                    // Cache result
+                    lastSearchedCity = document.getElementById('cityInput').value;
+                    lastWeatherData = weatherInfo;
+
+                    displayWeather(weatherInfo);
+                } else {
+                    resultDiv.innerHTML = "Error fetching weather data.";
+                }
+            };
+
+            weatherXhr.onerror = function () {
+                resultDiv.innerHTML = "Network error during weather fetch.";
+            };
+
+            weatherXhr.send();
+        }
+
+        function displayWeather(data) {
+            var resultDiv = document.getElementById('weatherResult');
+            resultDiv.innerHTML =
+                "<h3>Weather in " + data.city + "</h3>" +
+                "<p>Temperature: " + data.temp + "°C</p>" +
+                "<p>Humidity: " + data.humidity + "%</p>" +
+                "<p>Condition: " + data.condition + "</p>";
+        }
+
+        function getWeatherCondition(code) {
+            // WMO Weather interpretation codes (http://www.wmo.int/pages/prog/www/IMOP/publications/CIMO-Guide/CIMO_Guide-7th_Edition-2008.html)
+            // 0: Clear sky
+            // 1, 2, 3: Mainly clear, partly cloudy, and overcast
+            // 45, 48: Fog and depositing rime fog
+            // 51, 53, 55: Drizzle: Light, moderate, and dense intensity
+            // 56, 57: Freezing Drizzle: Light and dense intensity
+            // 61, 63, 65: Rain: Slight, moderate and heavy intensity
+            // 66, 67: Freezing Rain: Light and heavy intensity
+            // 71, 73, 75: Snow fall: Slight, moderate, and heavy intensity
+            // 77: Snow grains
+            // 80, 81, 82: Rain showers: Slight, moderate, and violent
+            // 85, 86: Snow showers slight and heavy
+            // 95: Thunderstorm: Slight or moderate
+            // 96, 99: Thunderstorm with slight and heavy hail
+
+            if (code === 0) return "Clear sky";
+            if (code >= 1 && code <= 3) return "Partly cloudy / Overcast";
+            if (code >= 45 && code <= 48) return "Fog";
+            if (code >= 51 && code <= 55) return "Drizzle";
+            if (code >= 61 && code <= 67) return "Rain";
+            if (code >= 71 && code <= 77) return "Snow";
+            if (code >= 80 && code <= 82) return "Rain Showers";
+            if (code >= 95 && code <= 99) return "Thunderstorm";
+            return "Unknown (Code: " + code + ")";
+        }
+    </script>
+
+</body>
+
+</html>

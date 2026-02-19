@@ -1,0 +1,20 @@
+[
+    {
+        "id": "101",
+        "name": "Sahajit Mondal",
+        "department": "CS",
+        "marks": 85
+    },
+    {
+        "id": "102",
+        "name": "Hritam Basak",
+        "department": "IT",
+        "marks": 78
+    },
+    {
+        "id": "103",
+        "name": "Sai Pranav",
+        "department": "ECE",
+        "marks": 92
+    }
+]
