@@ -1,0 +1,48 @@
+/* Exercise 2 - Student Cards */
+.page-title {
+  text-align: center;
+  color: #333;
+  font-family: 'Segoe UI', sans-serif;
+  margin: 30px 0;
+}
+
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+  padding: 0 20px;
+}
+
+.student-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  padding: 25px;
+  width: 260px;
+  font-family: 'Segoe UI', sans-serif;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.student-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.student-card h2 {
+  margin-top: 0;
+  color: #2563eb;
+  font-size: 20px;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+}
+
+.student-card p {
+  font-size: 15px;
+  color: #555;
+  margin: 8px 0;
+}
+
+.student-card strong {
+  color: #333;
+}

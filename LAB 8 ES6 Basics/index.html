@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAB 8 - ES6 Basics</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+        }
+        .btn-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 24px;
+            margin: 5px 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            background-color: #3498db;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #output {
+            background-color: #1e1e1e;
+            color: #0f0;
+            padding: 20px;
+            border-radius: 8px;
+            min-height: 120px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 15px;
+            white-space: pre-wrap;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>LAB 8 &ndash; ES6 Basics</h1>
+
+    <div class="btn-container">
+        <button onclick="runQuestion1()">Run Question 1</button>
+        <button onclick="runQuestion2()">Run Question 2</button>
+        <button onclick="runQuestion3()">Run Question 3</button>
+    </div>
+
+    <h3>Output:</h3>
+    <div id="output"></div>
+
+    <script>
+        // Helper: capture console.log output, run a function, then restore console.log
+        function captureConsole(fn) {
+            const logs = [];
+            const originalLog = console.log;
+            console.log = function (...args) {
+                logs.push(args.map(a => (typeof a === 'object' ? JSON.stringify(a, null, 2) : a)).join(' '));
+            };
+            try {
+                fn();
+            } finally {
+                console.log = originalLog;
+            }
+            return logs.join('\n');
+        }
+
+        // Helper for async functions (question3 uses Promises)
+        async function captureConsoleAsync(fn) {
+            const logs = [];
+            const originalLog = console.log;
+            console.log = function (...args) {
+                logs.push(args.map(a => (typeof a === 'object' ? JSON.stringify(a, null, 2) : a)).join(' '));
+            };
+            try {
+                await fn();
+            } finally {
+                console.log = originalLog;
+            }
+            return logs.join('\n');
+        }
+
+        function display(text) {
+            document.getElementById('output').textContent = text;
+        }
+
+        // ---- Question 1: Student Marks Calculation ----
+        function runQuestion1() {
+            const result = captureConsole(() => {
+                const studentName = "John Doe";
+
+                const marks1 = 85;
+                const marks2 = 92;
+                const marks3 = 78;
+                const marks4 = 90;
+                const marks5 = 88;
+
+                let totalMarks = 0;
+                let averageMarks = 0;
+
+                const calculateTotal = (m1, m2, m3, m4, m5) => m1 + m2 + m3 + m4 + m5;
+                const calculateAverage = (total, count) => total / count;
+                totalMarks = calculateTotal(marks1, marks2, marks3, marks4, marks5);
+                averageMarks = calculateAverage(totalMarks, 5);
+
+                console.log(`Student Name: ${studentName}`);
+                console.log(`Marks: ${marks1}, ${marks2}, ${marks3}, ${marks4}, ${marks5}`);
+                console.log(`Total Marks: ${totalMarks}`);
+                console.log(`Average Marks: ${averageMarks.toFixed(2)}`);
+            });
+            display(result);
+        }
+
+        // ---- Question 2: Object Destructuring & Spread ----
+        function runQuestion2() {
+            const result = captureConsole(() => {
+                const student = {
+                    id: 101,
+                    name: "Sahajit Mondal",
+                    department: "CSE",
+                    marks: 85
+                };
+
+                const { id, name, department, marks } = student;
+
+                console.log(`Student ID: ${id}`);
+                console.log(`Name: ${name}`);
+                console.log(`Department: ${department}`);
+                console.log(`Marks: ${marks}`);
+
+                const getGrade = (marks) => {
+                    if (marks >= 90) return "A";
+                    else if (marks >= 80) return "B";
+                    else if (marks >= 70) return "C";
+                    else if (marks >= 60) return "D";
+                    else return "F";
+                };
+
+                const updatedStudent = { ...student, grade: getGrade(marks) };
+
+                console.log(`\nUpdated Student Object:`);
+                console.log(updatedStudent);
+            });
+            display(result);
+        }
+
+        // ---- Question 3: Classes & Promises ----
+        async function runQuestion3() {
+            const result = await captureConsoleAsync(async () => {
+                class Course {
+                    constructor(courseName, instructor) {
+                        this.courseName = courseName;
+                        this.instructor = instructor;
+                    }
+
+                    displayDetails() {
+                        console.log(`Course: ${this.courseName}, Instructor: ${this.instructor}`);
+                    }
+
+                    enroll(seatsAvailable) {
+                        return new Promise((resolve, reject) => {
+                            if (seatsAvailable > 0) {
+                                resolve("Enrollment Successful");
+                            } else {
+                                reject("Course Full");
+                            }
+                        });
+                    }
+                }
+
+                const course = new Course("Web Technologies", "Dr. S Gopikrishnan");
+                course.displayDetails();
+
+                await course.enroll(5)
+                    .then((message) => console.log(message))
+                    .catch((error) => console.log(error));
+            });
+            display(result);
+        }
+    </script>
+
+</body>
+</html>
